@@ -65,5 +65,11 @@ class RegisterPage extends BasePage {
     return await this.getText('span[id="customer.username.errors"]')
   }
 
+  async logoutButton() {
+    await this.click('li a[href="logout.htm"]');
+  }
+
+
+
 }
 module.exports = RegisterPage;
