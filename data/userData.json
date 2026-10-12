@@ -1,0 +1,14 @@
+{
+  "validUser": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "address": "123 Automation St",
+    "city": "Queens",
+    "state": "New York",
+    "zipCode": "75321",
+    "phoneNumber": "+1123456789",
+    "ssn": "123-25-987",
+    "username": "JohnD_",
+    "password": "john123"
+  }
+}
