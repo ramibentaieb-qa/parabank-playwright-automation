@@ -29,9 +29,9 @@ class LoginPage extends BasePage {
     return await this.getText('p.error');
   }
 
-  async getSuccessMessage() {
-    return await this.getText('div#leftPanel p.smallText');
-  }
+  // async getSuccessMessage() {
+  //   return await this.getText('div#leftPanel p.smallText');
+  // }
 
 }
 
