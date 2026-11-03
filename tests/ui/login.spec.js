@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
-const LoginPage = require('../pages/LoginPage');
-const userData = require('../data/userData.json');
+const LoginPage = require('../../pages/LoginPage');
+const userData = require('../../data/userData.json');
 
 
 test.describe('ParaBank Login Tests', () => {
@@ -14,7 +14,7 @@ test.describe('ParaBank Login Tests', () => {
     await loginPage.clickLogin();
 
     const errorMessage = await loginPage.getErrorMessage();
-    expect(errorMessage).toContain('The username and password could not be verified.');
+    expect(errorMessage).toContain('An internal error has occurred and has been logged.');
   });
 
   test('Successful login with valid credentials', async({page}) => {
@@ -24,8 +24,8 @@ test.describe('ParaBank Login Tests', () => {
     await loginpage.setUsername(userData.validUser.username);
     await loginpage.setPassword(userData.validUser.password);
     await loginpage.clickLogin();
-    // const SuccessMessage = await loginpage.getSuccessMessage();
-    // expect(SuccessMessage).toContain('Accounts Overview');
+    const SuccessMessage = await loginpage.getSuccessMessage();
+    expect(SuccessMessage).toContain('Accounts Overview');
   });
 
 });

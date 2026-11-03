@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
-const RegisterPage = require('../pages/RegisterPage');
-const userData = require('../data/userData.json');
-const LoginPage = require('../pages/LoginPage');
+const RegisterPage = require('../../pages/RegisterPage');
+const userData = require('../../data/userData.json');
+const LoginPage = require('../../pages/LoginPage');
 
 test.describe('Parabank Register Tests', () => {
 
@@ -23,9 +23,9 @@ test.describe('Parabank Register Tests', () => {
         await registerPage.setPassword(userData.validUser.password);
         await registerPage.setRepeatedPassword(userData.validUser.password);
         await registerPage.clickRegister();
-        // const SuccessMessage = await registerPage.getSuccessMessage();
-        // expect(SuccessMessage).toContain(`Welcome ${userData.validUser.firstName 
-        // +` `+ userData.validUser.lastName}`);
+        const SuccessMessage = await registerPage.getSuccessMessage();
+        expect(SuccessMessage).toContain(`Welcome ${userData.validUser.firstName 
+        +` `+ userData.validUser.lastName}`);
         });
 
 
