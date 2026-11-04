@@ -12,7 +12,7 @@ module.exports = defineConfig({
   /* Opt out of parallel tests on CI to avoid server rate-limiting on demo apps */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [['list'], ['html', { open: 'never' }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -25,11 +25,11 @@ module.exports = defineConfig({
     screenshot: 'only-on-failure',
     expect: { timeout: 15_000 },
     use: {
-  baseURL: 'https://parabank.parasoft.com',
-  actionTimeout: 15_000,
-  navigationTimeout: 30_000,
-  trace: 'on-first-retry',
-  screenshot: 'only-on-failure',
+    baseURL: 'https://parabank.parasoft.com',
+    actionTimeout: 15_000,
+    navigationTimeout: 30_000,
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
 },
   },
 
