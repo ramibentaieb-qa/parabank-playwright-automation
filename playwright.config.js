@@ -3,41 +3,34 @@ const { defineConfig, devices } = require('@playwright/test');
 
 module.exports = defineConfig({
   testDir: './tests',
-  /* Run tests in files in parallel */
   fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI to avoid server rate-limiting on demo apps */
   workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [['list'], ['html', { open: 'never' }]],
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'https://parabank.parasoft.com',
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
-    
-    /* Take screenshot on failure */
-    screenshot: 'only-on-failure',
-    expect: { timeout: 15_000 },
-    use: {
-    baseURL: 'https://parabank.parasoft.com',
+  expect: { timeout: 15_000 },            // top level, not inside `use`
+
+  use: {                                  // shared by all projects
     actionTimeout: 15_000,
     navigationTimeout: 30_000,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-},
   },
 
-  /* Configure major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'ui',
+      testDir: './tests/ui',
+      use: { ...devices['Desktop Chrome'], baseURL: 'https://parabank.parasoft.com' },
+    },
+    {
+      name: 'api',
+      testDir: './tests/api',
+      use: {
+        baseURL: 'https://parabank.parasoft.com/parabank/services/bank/',  // trailing slash!
+        extraHTTPHeaders: { Accept: 'application/json' },
+      },
     },
   ],
 });
