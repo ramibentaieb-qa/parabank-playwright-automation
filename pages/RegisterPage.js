@@ -61,17 +61,15 @@ class RegisterPage extends BasePage {
     await this.click('input[type="submit"][value="Register"]');
   }
 
-  async errorMessage() {
-    const errorLocator = this.page.locator('#customer\\.username\\.errors, p.error, .error')
-    await errorLocator.first().waitFor({state: 'visible', timeout: 5000})
-    return await errorLocator.first().textContent();
+  errorMessage() {
+    return this.page.locator('[id="customer.username.errors"]');
   }
 
-  async getSuccessMessage() {
-    const succesMessage = this.page.locator('div#leftPanel p.smallText');
-    await succesMessage.first().waitFor({state: 'visible', timeout: 5000});
-    return await succesMessage.first().textContent();
-  }
+//   async getSuccessMessage() {
+//     const succesMessage = this.page.locator('div#leftPanel p.smallText');
+//     await succesMessage.first().waitFor({state: 'visible', timeout: 5000});
+//     return await succesMessage.first().textContent();
+//   }
 
   async logoutButton() {
     await this.click('li a[href="logout.htm"]');

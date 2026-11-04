@@ -23,6 +23,14 @@ module.exports = defineConfig({
     
     /* Take screenshot on failure */
     screenshot: 'only-on-failure',
+    expect: { timeout: 15_000 },
+    use: {
+  baseURL: 'https://parabank.parasoft.com',
+  actionTimeout: 15_000,
+  navigationTimeout: 30_000,
+  trace: 'on-first-retry',
+  screenshot: 'only-on-failure',
+},
   },
 
   /* Configure major browsers */

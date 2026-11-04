@@ -21,8 +21,8 @@ class LoginPage extends BasePage {
     await this.click('input[type="submit"][value="Log In"]');
   }
 
-  async getErrorMessage() {
-    return await this.getText('p.error');
+  errorMessage() {
+    return this.page.locator('p.error');
   }
 
    async login(username, password) {
@@ -32,8 +32,8 @@ class LoginPage extends BasePage {
     await this.clickLogin();
   }
 
-  async getSuccessMessage() {
-    return await this.getText('div#rightPanel p');
+  getSuccessMessage() {
+    return this.page.locator('div#leftPanel p.smallText');
   }
 
 }
