@@ -1,6 +1,7 @@
-const { test, expect } = require('@playwright/test');
+// const { test, expect } = require('@playwright/test');
 const LoginPage = require('../../pages/LoginPage');
-const userData = require('../../data/userData.json');
+// const userData = require('../../data/userData.json');
+const {test, expect} = require('../../fixtures');
 
 
 test.describe('ParaBank Login Tests', () => {
@@ -17,15 +18,15 @@ test.describe('ParaBank Login Tests', () => {
     expect(errorMessage).toContain('An internal error has occurred and has been logged.');
   });
 
-  test('Successful login with valid credentials', async({page}) => {
-    const loginpage = new LoginPage(page);
-
-    await loginpage.openHomePage();
-    await loginpage.setUsername(userData.validUser.username);
-    await loginpage.setPassword(userData.validUser.password);
-    await loginpage.clickLogin();
-    const SuccessMessage = await loginpage.getSuccessMessage();
-    expect(SuccessMessage).toContain('Accounts Overview');
+  test('Successful login with valid credentials', async({loginPage, registeredUser}) => {
+    console.log(registeredUser.username)
+    await loginPage.login(registeredUser.username, registeredUser.password);
+    
+    const message = await loginPage.getSuccessMessage();
+    expect(message).toContain(
+      'Your account was created successfully. You are now logged in.'
+    );
+    
   });
 
 });

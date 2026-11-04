@@ -77,5 +77,21 @@ class RegisterPage extends BasePage {
     await this.click('li a[href="logout.htm"]');
   }
 
+  async register(user) {
+    await this.open();
+    await this.setFirstName(user.firstName);
+    await this.setLastName(user.lastName);
+    await this.setAddress(user.address);
+    await this.setCity(user.city);
+    await this.setState(user.state);
+    await this.setZipCode(user.zipCode);
+    await this.setPhoneNumber(user.phoneNumber);
+    await this.setSsn(user.ssn);
+    await this.setUsername(user.username);
+    await this.setPassword(user.password);
+    await this.setRepeatedPassword(user.password);
+    await this.clickRegister();
+  }
+
 }
 module.exports = RegisterPage;

@@ -17,20 +17,23 @@ class LoginPage extends BasePage {
     await this.type('input[name="password"]', password);
   }
 
-  // async clickLogin() {
-  //   await this.click('input[type="submit"][value="Log In"]');
-  // }
-
   async clickLogin() {
-    await this.navigate('parabank/overview.htm');
+    await this.click('input[type="submit"][value="Log In"]');
   }
 
   async getErrorMessage() {
     return await this.getText('p.error');
   }
 
+   async login(username, password) {
+    await this.openHomePage();
+    await this.setUsername(username);
+    await this.setPassword(password);
+    await this.clickLogin();
+  }
+
   async getSuccessMessage() {
-    return await this.getText('div#leftPanel p.smallText');
+    return await this.getText('div#rightPanel p');
   }
 
 }
