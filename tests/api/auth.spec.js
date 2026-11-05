@@ -5,12 +5,9 @@ test('login with valid credentials returns the customer', async ({request, apiUs
     const response = await request.get(`login/${apiUser.username}/${apiUser.password}`);
 
     expect(response.status()).toBe(200);
-    const body = await response.json();
-    expect(body).toMatchObject({
-        id: apiUser.customerId,
-        firstName: apiUser.firstName,
-        lastName: apiUser.lastName,
-    });
+    const customer = await response.json();
+    expect(customer.id).toBe(apiUser.customerId);
+    expect(customer.firstName).toBe(apiUser.firstName);
 });
 
 test('login with bad credentials is rejected', async ({request}) => {

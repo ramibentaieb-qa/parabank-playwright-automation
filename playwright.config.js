@@ -9,9 +9,11 @@ module.exports = defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [['list'], ['html', { open: 'never' }]],
 
-  expect: { timeout: 15_000 },            // top level, not inside `use`
+  // top level, not inside `use`
+  expect: { timeout: 15_000 },            
 
-  use: {                                  // shared by all projects
+  // shared by all projects
+  use: {                                  
     actionTimeout: 15_000,
     navigationTimeout: 30_000,
     trace: 'on-first-retry',
@@ -28,7 +30,7 @@ module.exports = defineConfig({
       name: 'api',
       testDir: './tests/api',
       use: {
-        baseURL: 'https://parabank.parasoft.com/parabank/services/bank/',  // trailing slash!
+        baseURL: 'https://parabank.parasoft.com/parabank/services/bank/',
         extraHTTPHeaders: { Accept: 'application/json' },
       },
     },

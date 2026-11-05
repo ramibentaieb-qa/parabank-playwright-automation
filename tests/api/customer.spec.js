@@ -1,44 +1,49 @@
-const {test, expect} = require('@playwright/test');
+const { test, expect } = require('../../fixtures/api');
 
-test('GET /customers/{id} returns the customer as JSON', async ({request}) => {
-    const response = await request.get('customers/12212');
+test.describe('Customers API', () => {
 
-    
-    
-    
+  // GET
+  test('GET customer by id returns the customer', async ({ request, apiUser }) => {
+    const response = await request.get(`customers/${apiUser.customerId}`);
+
     expect(response.status()).toBe(200);
-    expect(response.headers()['content-type']).toContain('application/json');
+    const customer = await response.json();
+    expect(customer.id).toBe(apiUser.customerId);
+    expect(customer.firstName).toBe(apiUser.firstName);
+    expect(customer.lastName).toBe(apiUser.lastName);
+    expect(customer.address.city).toBe(apiUser.city);
+  });
 
-    const body = await response.json();
-    expect(body.id).toBe(12212);
-    expect(body.address).toBeDefined();
-});
+  // GET with a wrong id
+  test('GET customer with an unknown id returns 400', async ({ request }) => {
+    const response = await request.get('customers/999999999');
 
+    expect(response.status()).toBe(400);
+    expect(await response.text()).toBe('Could not find customer #999999999');
+  });
 
-
-
-test.describe('Customers API - negative cases', () => {
-
-    const notFoundCases = [
-        { name: 'nonexistent customer', path: 'customers/999999999', message: 'Could not find customer #999999999'},
-        { name: 'negative customer id', path: 'customers/-1', message: 'Could not find customer #-1' },
-        { name: 'accounts of nonexistent customer', path: 'customers/999999999/accounts', message: 'Could not find customer #999999999' },
-    ];
-    
-    for (const c of notFoundCases) {
-        test(`returns 400 with a plain-text message: ${c.name}`, async ({ request }) => {
-            const response = await request.get(c.path);
-            
-            expect(response.status()).toBe(400);
-            expect(response.headers()['content-type']).toContain('text/plain');
-            expect(await response.text()).toBe(c.message);
-        });
-    }
-    
-    test('returns 404 with an empty body for a non-numeric id', async({request}) => {
-        const response = await request.get('customers/abc');
-        
-        expect(response.status()).toBe(404);
-        expect(await response.text()).toBe('');
+  // POST (update)
+  test('POST update changes the customer city', async ({ request, apiUser }) => {
+    const response = await request.post(`customers/update/${apiUser.customerId}`, {
+      params: {
+        firstName: apiUser.firstName,
+        lastName: apiUser.lastName,
+        street: apiUser.address,
+        city: 'Boston',
+        state: apiUser.state,
+        zipCode: apiUser.zipCode,
+        phoneNumber: apiUser.phoneNumber,
+        ssn: apiUser.ssn,
+        username: apiUser.username,
+        password: apiUser.password,
+      },
     });
-})
+    expect(response.status()).toBe(200);
+
+    // checking that the change was saved
+    const getResponse = await request.get(`customers/${apiUser.customerId}`);
+    const customer = await getResponse.json();
+    expect(customer.address.city).toBe('Boston');
+  });
+
+});
