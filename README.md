@@ -1,3 +1,5 @@
+[![Playwright Tests](https://github.com/ramibentaieb-qa/parabank-playwright-automation/actions/workflows/playwright.yml/badge.svg)](https://github.com/ramibentaieb-qa/parabank-playwright-automation/actions/workflows/playwright.yml)
+
 # parabank-playwright-automation
 
 End-to-end test automation for the [ParaBank demo banking application](https://parabank.parasoft.com/parabank/), using Playwright and JavaScript.
