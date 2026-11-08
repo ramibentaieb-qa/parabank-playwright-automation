@@ -1,0 +1,6 @@
+services:
+  tests:
+    build: .
+    ipc: host
+    volumes: 
+      - ./playwright-report:/app/playwright-report
