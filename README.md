@@ -2,26 +2,27 @@
 
 # parabank-playwright-automation
 
-End-to-end test automation for the [ParaBank demo banking application](https://parabank.parasoft.com/parabank/), using Playwright and JavaScript.
+End-to-end and API test automation for the [ParaBank demo banking application](https://parabank.parasoft.com/parabank/), built with Playwright and JavaScript.
 
-The project covers the main registration and login flows through the browser. It also tests customer and account operations through ParaBank's REST API.
+The browser tests cover registration and login. The API tests cover customer and account operations through ParaBank's REST API. I built the project to practice Playwright, JavaScript and API testing. The suite runs locally, in Docker, and on GitHub Actions.
 
 ## Tech stack
 
 | Tool | Purpose |
 |---|---|
 | JavaScript | Test and framework code |
-| Playwright Test | Test runner, browser automation, and API requests |
-| Page Object Model (POM) | Keeps page actions and locators separate from test cases |
+| Playwright Test | Test runner, browser automation and API requests |
+| Page Object Model | Keeps locators and page actions out of the test files |
 | Playwright fixtures | Shares page objects and prepares test users |
-| GitHub Actions | Runs the test suite on pushes and pull requests |
-| Playwright HTML Reporter | Creates a report after test execution |
+| Docker and Docker Compose | Run the suite in the official Playwright image, so the environment is the same everywhere |
+| GitHub Actions | Runs the suite on pushes and pull requests |
+| Playwright HTML reporter | Creates a report after each run |
 
 ## What is covered
 
 ### UI tests
 
-The UI tests are located in `tests/ui/`.
+The UI tests are in `tests/ui/`.
 
 | Test file | Scenario |
 |---|---|
@@ -30,24 +31,24 @@ The UI tests are located in `tests/ui/`.
 | `register.spec.js` | Register a new customer |
 | `register.spec.js` | Reject a username that already exists |
 
-The UI fixtures create a new user when a test needs an existing account. The fixture registers the user through the website, checks that the user is logged in, then logs out before passing the user data to the test.
+When a test needs an existing account, the UI fixture registers a new user through the website, checks that the user is logged in, logs out, and then passes the user data to the test.
 
 ### API tests
 
-The API tests are located in `tests/api/`. They use Playwright's `request` fixture to send HTTP requests to ParaBank's REST API.
+The API tests are in `tests/api/`. They use Playwright's `request` fixture to call ParaBank's REST API.
 
 | Test file | Scenario |
 |---|---|
-| `auth.spec.js` | Login with valid credentials and verify the returned customer |
+| `auth.spec.js` | Login with valid credentials and check the returned customer |
 | `auth.spec.js` | Reject invalid login credentials |
-| `customer.spec.js` | Retrieve a customer by ID |
+| `customer.spec.js` | Get a customer by ID |
 | `customer.spec.js` | Check the response for an unknown customer ID |
-| `customer.spec.js` | Update a customer's city and verify the saved value |
-| `accounts.spec.js` | Retrieve a customer's accounts and check the initial checking account |
-| `accounts.spec.js` | Retrieve an account by ID |
-| `accounts.spec.js` | Create a savings account and verify it appears in the account list |
+| `customer.spec.js` | Update a customer's city and check the saved value |
+| `accounts.spec.js` | Get a customer's accounts and check the initial checking account |
+| `accounts.spec.js` | Get an account by ID |
+| `accounts.spec.js` | Create a savings account and check that it appears in the account list |
 
-The API fixture creates a new customer before the tests run. It first opens the registration page to establish a server session, submits the registration form, and then logs in to retrieve the customer's ID.
+The API fixture creates a new customer before the tests run. It opens the registration page first to get a server session, submits the registration form, then logs in to read the customer ID.
 
 ## Project structure
 
@@ -59,6 +60,7 @@ parabank-playwright-automation/
 │       └── playwright.yml
 │
 ├── data/
+│   ├── env.js
 │   ├── userData.json
 │   └── userFactory.js
 │
@@ -82,7 +84,10 @@ parabank-playwright-automation/
 │       ├── login.spec.js
 │       └── register.spec.js
 │
+├── .dockerignore
 ├── .gitignore
+├── docker-compose.yml
+├── Dockerfile
 ├── package.json
 ├── package-lock.json
 ├── playwright.config.js
@@ -91,7 +96,7 @@ parabank-playwright-automation/
 
 ## Project map
 
-The project has two test paths: UI tests use page objects and browser fixtures, while API tests use a separate fixture and Playwright's API request context.
+There are two test paths. UI tests use page objects and browser fixtures. API tests use their own fixture and Playwright's API request context. Both run inside the same Playwright container, locally or on CI.
 
 ```mermaid
 flowchart TD
@@ -111,20 +116,21 @@ flowchart TD
     K --> L["Playwright APIRequestContext"]
     L --> M["ParaBank REST API"]
 
-    N["GitHub Actions"] --> O["Install dependencies"]
-    O --> P["Install Playwright browsers"]
-    P --> A
+    N["Docker Compose (local)"] --> R["Playwright container image"]
+    O["GitHub Actions (CI)"] --> R
+    R --> A
     A --> Q["Playwright HTML report"]
 ```
 
-### How the main parts work together
+### How the parts fit together
 
-- **Tests:** Contain the test scenarios and assertions.
-- **Pages:** Keep browser actions in page classes. `BasePage` contains shared methods such as navigation, typing, clicking, and reading text.
-- **Fixtures:** Set up page objects and prepare registered users for UI and API tests.
-- **Data:** `userData.json` contains the base user data. `userFactory.js` generates a unique username for each new test user.
-- **Configuration:** `playwright.config.js` defines the UI and API projects, base URLs, timeouts, retries, and reporting.
-- **GitHub Actions:** Installs the project dependencies and browsers, runs the tests, and uploads the HTML report.
+- **Tests** hold the scenarios and assertions.
+- **Pages** keep browser actions in page classes. `BasePage` has the shared methods for navigation, typing, clicking and reading text.
+- **Fixtures** set up page objects and prepare registered users for the UI and API tests.
+- **Data**: `userData.json` has the base user data, and `userFactory.js` generates a unique username for each test user. `env.js` reads the `BASE_URL` environment variable and falls back to the public demo site.
+- **Configuration**: `playwright.config.js` defines the UI and API projects, timeouts, retries and reporters.
+- **Docker**: the `Dockerfile` builds the test image, and `docker-compose.yml` runs it with the right settings.
+- **GitHub Actions** runs the tests in the Playwright container and uploads the HTML report.
 
 ## Getting started
 
@@ -133,6 +139,7 @@ flowchart TD
 - Node.js (LTS recommended)
 - npm
 - Git
+- Docker, only if you want to run the tests in a container
 
 ### Installation
 
@@ -162,7 +169,7 @@ npx playwright install chromium
 
 ## Running the tests
 
-Run the complete test suite:
+Run the whole suite:
 
 ```bash
 npm test
@@ -186,6 +193,42 @@ Open the latest HTML report:
 npm run report
 ```
 
+## Running the tests with Docker
+
+The suite runs in the official Playwright image (`mcr.microsoft.com/playwright`). It already contains Node and the browsers, so you don't need to install anything except Docker. The first build downloads a large image, so expect it to take a while. Later builds use the cache and are quick.
+
+### With Docker Compose
+
+```bash
+docker compose up --build --abort-on-container-exit
+docker compose down
+```
+
+The HTML report is written to `playwright-report/` on your machine.
+
+### With plain Docker
+
+```bash
+docker build -t parabank-tests .
+docker run --rm --ipc=host -v "$(pwd)/playwright-report:/app/playwright-report" parabank-tests
+```
+
+On Windows PowerShell, use `${PWD}` instead of `$(pwd)`.
+
+### Pointing the tests at another environment
+
+The tests use the public ParaBank demo by default. Set `BASE_URL`, without a trailing slash, to use a different host:
+
+```bash
+BASE_URL=https://my-parabank-host docker compose up --build --abort-on-container-exit
+```
+
+On PowerShell, set `$env:BASE_URL="https://my-parabank-host"` first, and remove it afterwards with `Remove-Item Env:BASE_URL`.
+
+### Updating Playwright
+
+The image tag in the `Dockerfile` and in `.github/workflows/playwright.yml` has to match the `@playwright/test` version in `package-lock.json`. Change all three in the same commit. You can check the installed version with `npm ls @playwright/test`.
+
 ## Playwright configuration
 
 The configuration is in `playwright.config.js`.
@@ -196,8 +239,8 @@ The configuration is in `playwright.config.js`.
 | UI project | `./tests/ui` |
 | API project | `./tests/api` |
 | UI browser | Desktop Chrome (Chromium) |
-| UI base URL | `https://parabank.parasoft.com` |
-| API base URL | `https://parabank.parasoft.com/parabank/services/bank/` |
+| UI base URL | `BASE_URL`, default `https://parabank.parasoft.com` |
+| API base URL | `BASE_URL` plus `/parabank/services/bank/` |
 | Parallel execution | Enabled |
 | Retries | 2 in CI, 0 locally |
 | Workers | 1 in CI, Playwright default locally |
@@ -208,36 +251,32 @@ The configuration is in `playwright.config.js`.
 | Trace | On first retry |
 | Reporters | List and HTML |
 
-The UI and API tests are configured as separate Playwright projects. This makes it possible to run either group without running the other.
+The UI and API tests are separate Playwright projects, so you can run one group without the other.
 
 ## Continuous integration
 
-GitHub Actions runs the Playwright suite when code is pushed to, or a pull request targets, the `main` or `master` branch.
+GitHub Actions runs the suite when code is pushed to, or a pull request targets, `main` or `master`. You can also start it by hand from the Actions tab.
 
-The workflow is defined in `.github/workflows/playwright.yml`.
-
-It performs these steps:
+The workflow is `.github/workflows/playwright.yml`. The job runs inside the `mcr.microsoft.com/playwright` container, the same image the Dockerfile uses, so CI and local Docker runs behave alike. It does these things:
 
 1. Checks out the repository.
-2. Sets up Node.js using the current LTS release.
-3. Installs dependencies with `npm ci`.
-4. Installs Playwright browsers and their system dependencies.
-5. Runs the test suite with `npx playwright test`.
-6. Uploads the Playwright HTML report as an artifact, with a 30-day retention period.
+2. Installs dependencies with `npm ci`.
+3. Runs the suite with `npx playwright test`.
+4. Uploads the HTML report as an artifact, kept for 30 days.
 
-You can find the workflow runs in the repository's **Actions** tab.
+Browsers and Node come with the image, so the workflow doesn't install them. Workflow runs are listed in the repository's Actions tab.
 
 ## Notes
 
-- The tests use the public ParaBank demo application, so execution depends on that service being available.
-- The user factory generates a different username for each test user to reduce conflicts with previously registered accounts.
-- The UI and API fixtures create their own test users. They do not share the same browser or API session.
-- The current UI project is configured for Chromium. Firefox and WebKit are not configured as projects.
-- `AccountsOverviewPage.js` is present in the repository, but it is currently empty and is not used by the listed tests.
-- The current automated coverage focuses on registration, authentication, customer details, and account creation. Fund transfers and bill payments are not covered by the test files currently in the repository.
+- The tests use the public ParaBank demo, so a run depends on that service being up. It is sometimes slow or returns connection resets and internal errors. That is why CI retries failed tests twice and uses one worker. A test that passes on retry shows up as flaky in the report.
+- The user factory generates a different username for each test user to avoid clashes with earlier registrations.
+- The UI and API fixtures create their own test users. They don't share a browser or API session.
+- The UI project only runs in Chromium. Firefox and WebKit aren't configured.
+- `AccountsOverviewPage.js` is in the repository but empty, and no test uses it yet.
+- Coverage is limited to registration, authentication, customer details and account creation. Fund transfers and bill payments aren't tested.
 
 ## Author
 
-**Rami Ben Taieb**
+Rami Ben Taieb
 
 GitHub: [ramibentaieb-qa](https://github.com/ramibentaieb-qa)
