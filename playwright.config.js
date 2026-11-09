@@ -1,5 +1,6 @@
 // @ts-check
 const { defineConfig, devices } = require('@playwright/test');
+const {BASE_URL} = require('./data/env');
 
 module.exports = defineConfig({
   testDir: './tests',
@@ -24,13 +25,13 @@ module.exports = defineConfig({
     {
       name: 'ui',
       testDir: './tests/ui',
-      use: { ...devices['Desktop Chrome'], baseURL: 'https://parabank.parasoft.com' },
+      use: { ...devices['Desktop Chrome'], baseURL: BASE_URL },
     },
     {
       name: 'api',
       testDir: './tests/api',
       use: {
-        baseURL: 'https://parabank.parasoft.com/parabank/services/bank/',
+        baseURL: `${BASE_URL}/parabank/services/bank/`,
         extraHTTPHeaders: { Accept: 'application/json' },
       },
     },

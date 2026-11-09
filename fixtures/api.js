@@ -1,7 +1,7 @@
 const { test: base, expect } = require('@playwright/test');
 const { createUser } = require('../data/userFactory');
-
-const REGISTER_URL = 'https://parabank.parasoft.com/parabank/register.htm';
+const {BASE_URL} = require('../data/env');
+const REGISTER_URL = `${BASE_URL}/parabank/register.htm`;
 
 exports.test = base.extend({
   apiUser: async ({ request }, use) => {
